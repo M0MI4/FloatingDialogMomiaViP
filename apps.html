@@ -1,55 +1,122 @@
-<h1>Ferkari Ba Wena3</h1>
+<div class="column" style="width: 100%; max-width: 600px; margin: auto;">
+  <div class="content" style="background: rgba(0, 0, 0, 0.05); border-radius: 15px; padding: 20px; text-align: center; border: 1px solid #ddd;">
+    <h2>پێشبڕکێی Snapchat Prime 🏆</h2>
+    <p>وەڵامی ئەم ٥ پرسیارە بدەرەوە، ٣ کەسی یەکەم کلیلی ڤی ئای پی دەبەنەوە!</p>
+    <hr>
 
-<hr>
+    <div id="username-section">
+      <p style="font-weight: bold;">بۆ بەشداریکردن، یوزەری تەلەگرامی خۆت بنووسە:</p>
+      <input type="text" id="tg-username" placeholder="@YourUsername" style="padding: 12px; width: 80%; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 15px; font-size: 16px;">
+      <br>
+      <button onclick="startQuiz()" style="padding: 10px 25px; background-color: #fffc00; color: black; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">دەستپێکردنی کویز</button>
+    </div>
 
-<!-- Portfolio Gallery Grid -->
-<div class="row">
-  <div class="column">
-    <div class="content">
-      <h3></h3>
+    <div id="quiz-section" style="display: none;">
+      <h3 id="question-text" style="margin-bottom: 20px; color: #333;"></h3>
+      <div id="options-area" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      <p id="progress-text" style="margin-top: 15px; font-size: 14px; color: #666;"></p>
+    </div>
+
+    <div id="result-section" style="display: none;">
+      <h3 style="color: #28a745;">کویزەکە تەواو بوو! 🎉</h3>
+      <h2 id="score-text"></h2>
+      <p id="final-message" style="margin-top: 10px; font-weight: bold;"></p>
     </div>
   </div>
-  <div class="column">
-    <div class="content">
-    <img src="https://i.imghippo.com/files/dZip41724261762.jpg" alt="Lights" style="width:100%">
-      <h3>Taybat Mandi Menu</h3>
-      <hr>
-    </div>
-  </div>
-  <div class="column">
-    <div class="content">
-    <img src="https://i.imghippo.com/files/PewMm1724261901.jpg" alt="Lights" style="width:100%">
-      <h3>Taybat Mandi Menu</h3>
-      <hr>
+</div>
+
+<script>
+  // زانیارییەکانی بۆتی تەلەگرامەکەت لێرە دابنێ
+  const BOT_TOKEN = "8755532350:AAHbBSjy3FsuPdNYQ5nE3iHMMXN26-j49Vg"; 
+  const CHAT_ID = "8755532350";
+
+  const questions = [
+    { q: "سناپچات پڕایم کام لەم تایبەتمەندیانەی هەیە؟", options: ["تەنها بینینی نامە", "گۆڕینی لۆکەیشن و بینینی ستۆری بە نهێنی", "هیچیان"], answer: 1 },
+    { q: "ئایا دەتوانیت ڤیدیۆی ستۆری خەڵک سەیڤ بکەیت بەبێ ئاگادارکردنەوەیان؟", options: ["بەڵێ بە دڵنیاییەوە", "نەخێر ڕێگەپێدراو نییە", "تەنها بۆ ڤیدیۆی کورت"], answer: 0 },
+    { q: "بە چ زمانێک پڕۆگرامەکانی ئەندرۆید زۆرجار دادەڕێژرێنەوە؟", options: ["HTML", "Smali / Java", "CSS"], answer: 1 },
+    { q: "کلیلی ڤی ئای پی بۆ چی بەکاردێت؟", options: ["بۆ کردنەوەی ئەکاونتی نوێ", "بۆ ئەکتیڤکردنی تایبەتمەندییە VIP ـیەکان", "بۆ سڕینەوەی سناپچات"], answer: 1 },
+    { q: "باشترین ڕێگە بۆ خۆپاراستن لە باندبوون چییە؟", options: ["بەکارهێنانی وەشانە کۆنەکان", "نوێکردنەوەی بەردەوامی مۆدەکە", "لابردنی ئینتەرنێت"], answer: 1 }
+  ];
+
+  let currentQuestion = 0;
+  let score = 0;
+  let username = "";
+
+  function startQuiz() {
+    username = document.getElementById("tg-username").value;
+    if(username.trim() === "" || !username.includes("@")) {
+      alert("تکایە یوزەری تەلەگرام بە دروستی بنووسە (بە @ دەست پێ بکات).");
+      return;
+    }
+    document.getElementById("username-section").style.display = "none";
+    document.getElementById("quiz-section").style.display = "block";
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    if(currentQuestion >= questions.length) {
+      showResults();
+      return;
+    }
+    const qData = questions[currentQuestion];
+    document.getElementById("question-text").innerText = qData.q;
+    document.getElementById("progress-text").innerText = `پرسیاری ${currentQuestion + 1} لە ${questions.length}`;
+
+    const optionsArea = document.getElementById("options-area");
+    optionsArea.innerHTML = "";
+
+    qData.options.forEach((opt, index) => {
+      const btn = document.createElement("button");
+      btn.innerText = opt;
+      btn.style.padding = "12px";
+      btn.style.border = "1px solid #ccc";
+      btn.style.borderRadius = "8px";
+      btn.style.backgroundColor = "#fff";
+      btn.style.cursor = "pointer";
+      btn.style.fontSize = "16px";
+      btn.onclick = () => checkAnswer(index); 
+      optionsArea.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedIndex) {
+    if(selectedIndex === questions[currentQuestion].answer) {
+      score++;
+    }
+    currentQuestion++;
+    loadQuestion();
+  }
+
+  function showResults() {
+    document.getElementById("quiz-section").style.display = "none";
+    document.getElementById("result-section").style.display = "block";
     
-    </div>
-  </div>
-  <div class="column">
-    <div class="content">
-    <img src="https://i.imghippo.com/files/gC7Oo1724261989.jpg" alt="Lights" style="width:100%">
-      <h3>Taybat Mandi Menu</h3>
-      <hr>
-      </div>
-  </div>
-  <div class="column">
-    <div class="content">
+    // پیشاندانی نمرە بە بەکارهێنەر
+    document.getElementById("score-text").innerText = `نمرەکەت: ${score} لە ${questions.length}`;
+    
+    const finalMessageElement = document.getElementById("final-message");
 
-      <h3>Ferkari Video</h3>
-  </div>
-      <video width="320" height="240" controls>
-   <source src="https://i.imghippo.com/files/3vZRp1729163211.mp4">
-      </video
-<p>Ferkari Ziadkrdni Ranga Kalakan</p>
-  
-  </div>
-      <video width="320" height="240" controls>
-   <source src="https://i.imghippo.com/files/1nWPf1729162972.mp4">
-      </video
-<p>Ferkari Dagrtni Strike u Score</p>
-  </div>
-      <video width="320" height="240" controls>
-   <source src="https://i.imghippo.com/files/gAwXU1729163151.mp4">
-      </video
-<p>Ferkari Dagrtni Storie & Spotlight & Discoveer</p>
-      
+    if (score >= 4) {
+      finalMessageElement.innerText = "ئافەرین! نمرەیەکی بەرزت هێنا، یوزەرەکەت نێردرا بۆ بەڕێوەبەر.";
+      finalMessageElement.style.color = "green";
+      sendToTelegramBot(username, score);
+    } else {
+      finalMessageElement.innerText = "بەداخەوە نمرەکەت کەمە، هیوای سەرکەوتن بۆ جاری داهاتوو.";
+      finalMessageElement.style.color = "red";
+    }
+  }
 
+  function sendToTelegramBot(user, userScore) {
+    const textMsg = `🏆 براوەیەکی نوێ!\n\n👤 یوزەر: ${user}\n🎯 نمرە: ${userScore} لە ${questions.length}`;
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(textMsg)}`;
+
+    // بەکارهێنانی Fetch بۆ ناردنی داتا بەبێ لۆدکردنی پەڕەکە (زۆر سووکە)
+    fetch(url)
+      .then(response => {
+        if(!response.ok) {
+          console.error("کێشە لە ناردنی داتا بۆ تەلەگرام.");
+        }
+      })
+      .catch(err => console.error(err));
+  }
+</script>
